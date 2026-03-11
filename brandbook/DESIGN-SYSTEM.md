@@ -152,17 +152,15 @@ Based on 4px (0.25rem) increments:
 
 ### 2.5 Dashboard / Dense UI Tokens
 
-For dense, terminal-style application dashboards (e.g. Open-Agents oa-cli web UI).
+For dense, application dashboards with dark sidebars, panels, and terminal-style output areas.
 Derived from core brand tokens — no new colors introduced.
-
-#### Dark theme (default for dashboards)
 
 | Token | Value | Derived from | Usage |
 |-------|-------|-------------|-------|
 | `--dashboard-bg` | `#2A2A32` | `--night-build` | Primary background |
 | `--dashboard-surface` | `#36363E` | `--deep-forge` | Cards, panels |
-| `--dashboard-surface-hover` | `#3E3E48` | deep-forge + 8% lighter | Hover states |
-| `--dashboard-sidebar` | `#222228` | night-build - 8% | Sidebar, left nav |
+| `--dashboard-surface-hover` | `#3E3E48` | deep-forge + 8% | Hover states |
+| `--dashboard-sidebar` | `#222228` | night-build − 8% | Sidebar, left nav |
 | `--dashboard-border` | `#4A4A54` | deep-forge + border | Dividers, outlines |
 | `--dashboard-border-light` | `#404048` | subtle dividers | Section separators |
 | `--dashboard-text` | `#FAFAF9` | `--blueprint-white` | Primary text |
@@ -173,36 +171,6 @@ Derived from core brand tokens — no new colors introduced.
 | `--dashboard-accent-hover` | `#EA580C` | `--signal-orange` | Hover on accent |
 | `--dashboard-terminal` | `#F59E0B` | `--warm-gold` | Terminal/live output context |
 | `--dashboard-terminal-dim` | `#D97706` | `--amber` | Dimmed terminal text |
-
-#### Agent status colors
-
-Mapped to semantic colors from section 2.1:
-
-| State | Color | Token | Rationale |
-|-------|-------|-------|-----------|
-| running | `#16A34A` | `--success` | Active build — positive, live |
-| done | `#16A34A` | `--success` | Completed successfully |
-| error | `#DC2626` | `--error` | Failed |
-| timeout / warning | `#F59E0B` | `--warm-gold` / `--warning` | Degraded state |
-| killed / inactive | `#A1A1AA` | `--scaffold-gray` | Neutral, stopped |
-
-#### Model tier colors
-
-| Model tier | Color | Token | Rationale |
-|------------|-------|-------|-----------|
-| opus (premium) | `#D97706` | `--amber` | High-value, primary accent |
-| sonnet (standard) | `#EA580C` | `--signal-orange` | Active, mid-tier |
-| haiku (fast) | `#F59E0B` | `--warm-gold` | Light, efficient |
-| ollama (local/free) | `#16A34A` | `--success` | Open-source, free |
-
-#### Logo usage in app headers
-
-| Context | Asset | Notes |
-|---------|-------|-------|
-| Dark dashboard header | `openaec-logo-amber-on-dark.svg` | Max-height: 40px |
-| Collapsed sidebar / icon | `openaec-symbol-amber-on-dark.svg` | 32×32px |
-| Favicon | `openaec-symbol-amber-on-dark.svg` | Convert to .ico / 32×32 PNG |
-| Light mode header | `openaec-logo-dark-on-light.svg` | Max-height: 40px |
 
 ### 2.6 Shadows
 
