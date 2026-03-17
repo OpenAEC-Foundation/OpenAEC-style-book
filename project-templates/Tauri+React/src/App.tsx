@@ -98,7 +98,7 @@ function App() {
   return (
     <>
       <TitleBar onSettingsClick={() => setSettingsOpen(true)} onFeedbackClick={() => setFeedbackOpen(true)} />
-      <Ribbon onFileTabClick={() => setBackstageOpen(true)} />
+      <Ribbon onFileTabClick={() => setBackstageOpen(true)} onSettingsClick={() => setSettingsOpen(true)} />
       <DocumentBar />
       <div className="content">
         {/* Left panel — Explorer */}

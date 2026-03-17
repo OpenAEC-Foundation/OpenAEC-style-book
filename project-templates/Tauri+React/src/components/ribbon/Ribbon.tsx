@@ -2,18 +2,17 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import RibbonTab from "./RibbonTab";
 import HomeTab from "./HomeTab";
-import ViewTab from "./ViewTab";
-import ToolsTab from "./ToolsTab";
 import "./Ribbon.css";
 
 interface RibbonProps {
   onFileTabClick?: () => void;
+  onSettingsClick?: () => void;
 }
 
-const TABS = ["home", "view", "tools"] as const;
+const TABS = ["home"] as const;
 type TabId = (typeof TABS)[number];
 
-export default function Ribbon({ onFileTabClick }: RibbonProps) {
+export default function Ribbon({ onFileTabClick, onSettingsClick }: RibbonProps) {
   const { t, i18n } = useTranslation("ribbon");
   const [activeTab, setActiveTab] = useState<TabId>("home");
   const [prevTab, setPrevTab] = useState<TabId | null>(null);
@@ -66,7 +65,6 @@ export default function Ribbon({ onFileTabClick }: RibbonProps) {
 
   useEffect(() => {
     updateHighlight();
-    // Re-measure after DOM updates (e.g. language change resizes tab text)
     requestAnimationFrame(updateHighlight);
   }, [activeTab, i18n.language, updateHighlight]);
 
@@ -86,9 +84,7 @@ export default function Ribbon({ onFileTabClick }: RibbonProps) {
 
   const renderContent = (tab: TabId) => {
     switch (tab) {
-      case "home": return <HomeTab />;
-      case "view": return <ViewTab />;
-      case "tools": return <ToolsTab />;
+      case "home": return <HomeTab onSettingsClick={onSettingsClick} />;
     }
   };
 
