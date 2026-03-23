@@ -1,13 +1,53 @@
 {
   "tabs": {
     "file": "File",
-    "home": "Home"
+    "home": "Home",
+    "ifc": "IFC",
+    "viewer": "3D Viewer",
+    "report": "Report"
   },
   "home": {
     "general": "General",
+    "project": "Project",
     "settings": "Settings",
     "help": "Help",
     "helpBtn": "Help",
     "about": "About"
+  },
+  "ifc": {
+    "fileOps": "File",
+    "import": "Import IFC",
+    "export": "Export IFC",
+    "model": "Model",
+    "structure": "Structure",
+    "statistics": "Statistics",
+    "tools": "Tools",
+    "validate": "Validate",
+    "lines": "lines"
+  },
+  "viewer": {
+    "file": "File",
+    "loadModel": "Load Model",
+    "navigation": "Navigation",
+    "orbit": "Orbit",
+    "fitAll": "Fit All",
+    "analysis": "Analysis",
+    "section": "Section",
+    "measure": "Measure",
+    "display": "Display",
+    "wireframe": "Wireframe"
+  },
+  "report": {
+    "document": "Document",
+    "newReport": "New Report",
+    "templates": "Templates",
+    "sections": "Sections",
+    "cover": "Cover",
+    "page": "Page",
+    "portrait": "Portrait",
+    "landscape": "Landscape",
+    "output": "Output",
+    "generate": "Generate PDF",
+    "preview": "Preview"
   }
 }

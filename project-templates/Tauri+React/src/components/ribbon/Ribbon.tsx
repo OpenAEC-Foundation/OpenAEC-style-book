@@ -2,17 +2,26 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import RibbonTab from "./RibbonTab";
 import HomeTab from "./HomeTab";
+import IfcTab from "./IfcTab";
+import ReportTab from "./ReportTab";
 import "./Ribbon.css";
 
 interface RibbonProps {
   onFileTabClick?: () => void;
   onSettingsClick?: () => void;
+  onProjectSettingsClick?: () => void;
+  activeView: string;
+  onViewChange: (view: string) => void;
+  pageSize: "A4" | "A3";
+  orientation: "portrait" | "landscape";
+  onPageSizeChange: (size: "A4" | "A3") => void;
+  onOrientationChange: (orientation: "portrait" | "landscape") => void;
 }
 
-const TABS = ["home"] as const;
+const TABS = ["home", "ifc", "viewer", "report"] as const;
 type TabId = (typeof TABS)[number];
 
-export default function Ribbon({ onFileTabClick, onSettingsClick }: RibbonProps) {
+export default function Ribbon({ onFileTabClick, onSettingsClick, onProjectSettingsClick, onViewChange, pageSize, orientation, onPageSizeChange, onOrientationChange }: RibbonProps) {
   const { t, i18n } = useTranslation("ribbon");
   const [activeTab, setActiveTab] = useState<TabId>("home");
   const [prevTab, setPrevTab] = useState<TabId | null>(null);
@@ -61,7 +70,13 @@ export default function Ribbon({ onFileTabClick, onSettingsClick }: RibbonProps)
     setPrevTab(activeTab);
     setActiveTab(newTab);
     setAnimating(true);
-  }, [activeTab]);
+
+    // Switch main content view based on tab
+    if (newTab === "ifc") onViewChange("ifc");
+    else if (newTab === "viewer") onViewChange("viewer");
+    else if (newTab === "report") onViewChange("report");
+    else onViewChange("default");
+  }, [activeTab, onViewChange]);
 
   useEffect(() => {
     updateHighlight();
@@ -84,9 +99,15 @@ export default function Ribbon({ onFileTabClick, onSettingsClick }: RibbonProps)
 
   const renderContent = (tab: TabId) => {
     switch (tab) {
-      case "home": return <HomeTab onSettingsClick={onSettingsClick} />;
+      case "home": return <HomeTab onSettingsClick={onSettingsClick} onProjectSettingsClick={onProjectSettingsClick} />;
+      case "ifc": return <IfcTab />;
+      case "viewer": return null; // 3D Viewer has no ribbon buttons
+      case "report": return <ReportTab pageSize={pageSize} orientation={orientation} onPageSizeChange={onPageSizeChange} onOrientationChange={onOrientationChange} />;
     }
   };
+
+  // Hide ribbon content area for viewer tab (no buttons needed)
+  const hideContent = activeTab === "viewer";
 
   return (
     <div className="ribbon-container">
@@ -104,22 +125,24 @@ export default function Ribbon({ onFileTabClick, onSettingsClick }: RibbonProps)
         <div className="ribbon-tab-gap" ref={gapRef} />
       </div>
 
-      <div className="ribbon-content-wrapper">
-        {animating && prevTab && (
+      {!hideContent && (
+        <div className="ribbon-content-wrapper">
+          {animating && prevTab && prevTab !== "viewer" && (
+            <div
+              className={`ribbon-content-panel ribbon-panel-exit-${direction}`}
+              key={`prev-${prevTab}`}
+            >
+              {renderContent(prevTab)}
+            </div>
+          )}
           <div
-            className={`ribbon-content-panel ribbon-panel-exit-${direction}`}
-            key={`prev-${prevTab}`}
+            className={`ribbon-content-panel${animating ? ` ribbon-panel-enter-${direction}` : ""}`}
+            key={`active-${activeTab}`}
           >
-            {renderContent(prevTab)}
+            {renderContent(activeTab)}
           </div>
-        )}
-        <div
-          className={`ribbon-content-panel${animating ? ` ribbon-panel-enter-${direction}` : ""}`}
-          key={`active-${activeTab}`}
-        >
-          {renderContent(activeTab)}
         </div>
-      </div>
+      )}
     </div>
   );
 }

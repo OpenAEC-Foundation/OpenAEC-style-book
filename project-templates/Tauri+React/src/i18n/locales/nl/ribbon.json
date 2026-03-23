@@ -1,13 +1,53 @@
 {
   "tabs": {
     "file": "Bestand",
-    "home": "Start"
+    "home": "Start",
+    "ifc": "IFC",
+    "viewer": "3D Viewer",
+    "report": "Rapport"
   },
   "home": {
     "general": "Algemeen",
+    "project": "Project",
     "settings": "Instellingen",
     "help": "Help",
     "helpBtn": "Help",
     "about": "Over"
+  },
+  "ifc": {
+    "fileOps": "Bestand",
+    "import": "IFC Importeren",
+    "export": "IFC Exporteren",
+    "model": "Model",
+    "structure": "Structuur",
+    "statistics": "Statistieken",
+    "tools": "Gereedschap",
+    "validate": "Valideren",
+    "lines": "regels"
+  },
+  "viewer": {
+    "file": "Bestand",
+    "loadModel": "Model Laden",
+    "navigation": "Navigatie",
+    "orbit": "Roteren",
+    "fitAll": "Passend",
+    "analysis": "Analyse",
+    "section": "Doorsnede",
+    "measure": "Meten",
+    "display": "Weergave",
+    "wireframe": "Draadmodel"
+  },
+  "report": {
+    "document": "Document",
+    "newReport": "Nieuw Rapport",
+    "templates": "Sjablonen",
+    "sections": "Secties",
+    "cover": "Voorblad",
+    "page": "Pagina",
+    "portrait": "Staand",
+    "landscape": "Liggend",
+    "output": "Uitvoer",
+    "generate": "PDF Genereren",
+    "preview": "Voorbeeld"
   }
 }

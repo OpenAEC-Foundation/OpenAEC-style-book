@@ -264,10 +264,10 @@ function ThemeDropdown({
   );
 }
 
-/* ─── About Tab ─────────────────────────────────────────────
-   Pas naam, versie en beschrijving aan via i18n keys
-   in locales/*/settings.json → about.*
-   ─────────────────────────────────────────────────────────── */
+// ─── About Tab ───────────────────────────────────────────────
+// Pas naam, versie en beschrijving aan via i18n keys
+// in locales/{lang}/settings.json, sectie "about"
+// ─────────────────────────────────────────────────────────────
 function AboutTabContent() {
   const { t } = useTranslation("settings");
   return (

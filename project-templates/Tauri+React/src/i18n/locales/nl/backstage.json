@@ -29,6 +29,13 @@
     "fromTemplate": "Importeren uit sjabloon",
     "fromTemplateDesc": "Laad een vooraf gemaakt sjabloon als startpunt"
   },
+  "extensions": "Extensies",
+  "extInstalled": "Geïnstalleerd",
+  "extBrowse": "Bladeren",
+  "extSearchPlaceholder": "Zoek extensies...",
+  "extInstallFile": "Installeren uit bestand",
+  "extInstalledBadge": "Geïnstalleerd",
+  "extInstallBtn": "Installeren",
   "exportPanel": {
     "title": "Exporteren",
     "asPdf": "Exporteren als PDF",

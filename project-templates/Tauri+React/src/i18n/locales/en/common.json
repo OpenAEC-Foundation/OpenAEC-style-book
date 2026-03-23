@@ -36,5 +36,33 @@
   "contentPlaceholder": "Content here",
   "sendFeedback": "Send Feedback",
   "explorer": "Explorer",
-  "properties": "Properties"
+  "properties": "Properties",
+  "welcome": {
+    "subtitle": "Professional desktop application template",
+    "getStarted": "Get Started",
+    "newProject": "New Project",
+    "newProjectDesc": "Create a new project from scratch",
+    "openProject": "Open Project",
+    "openProjectDesc": "Open an existing project file",
+    "recent": "Recent Projects",
+    "noRecent": "No recent projects yet.",
+    "showOnStartup": "Show this screen on startup",
+    "skip": "Skip"
+  },
+  "projectSettings": {
+    "title": "Project Settings",
+    "info": "Project Information",
+    "name": "Project Name",
+    "number": "Project Number",
+    "engineer": "Engineer",
+    "company": "Company",
+    "date": "Date",
+    "description": "Description",
+    "notes": "Notes",
+    "location": "Location",
+    "erpNext": "ERPNext Integration",
+    "erpUrl": "ERPNext URL",
+    "erpSearch": "Search Project",
+    "erpSearchPlaceholder": "Search by project name or number..."
+  }
 }

@@ -1,0 +1,103 @@
+.report-preview {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--theme-bg);
+}
+
+.report-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  background: var(--theme-bg-lighter);
+  border-bottom: 1px solid var(--theme-border-subtle);
+  flex-shrink: 0;
+}
+
+.report-page-info {
+  font-size: 11px;
+  color: var(--theme-text-secondary);
+}
+
+.report-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.report-zoom-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-btn-secondary-bg);
+  border: 1px solid var(--theme-border-subtle);
+  border-radius: 3px;
+  color: var(--theme-text);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: default;
+  transition: all 0.12s;
+}
+
+.report-zoom-btn:hover {
+  background: var(--theme-hover-strong);
+  border-color: var(--theme-accent);
+  color: var(--theme-accent);
+}
+
+.report-zoom-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--theme-text-secondary);
+  min-width: 36px;
+  text-align: center;
+}
+
+.report-print-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  background: var(--theme-btn-primary-bg);
+  border: none;
+  border-radius: 4px;
+  color: var(--theme-btn-primary-text);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: default;
+  transition: background 0.12s;
+}
+
+.report-print-btn:hover {
+  background: var(--theme-btn-primary-hover-bg);
+}
+
+.report-print-btn svg {
+  stroke: var(--theme-btn-primary-text);
+}
+
+.report-pages-wrapper {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  gap: 16px;
+  background: #52525b;
+}
+
+.report-page {
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+  overflow: hidden;
+}
