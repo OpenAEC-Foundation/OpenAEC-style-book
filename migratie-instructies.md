@@ -14,21 +14,22 @@ Bepaal eerst welk type app je migreert:
 
 | | **Desktop (Tauri+React)** | **Web (React SPA)** |
 |---|---|---|
-| Window chrome | Custom TitleBar (frameless) | Browser-native |
-| Toolbar | Ribbon (Office-stijl tabs) | Navbar + page tabs |
-| File menu | Backstage overlay | Navigatie / routes |
+| Top bar | Custom TitleBar (frameless, 32px, window controls) | AppBar (browser-native chrome, 40px, user menu) |
+| Toolbar | **Ribbon** (Office-stijl tabs) — VERPLICHT | **Ribbon** (Office-stijl tabs) — VERPLICHT |
+| File menu | **Backstage** overlay — VERPLICHT | **Backstage** overlay — VERPLICHT |
+| Status bar | **StatusBar** (22px) — VERPLICHT | **StatusBar** (22px) — VERPLICHT |
 | Persistentie | Tauri Store | localStorage / server |
 | Auth | Tauri Store of OS keychain | OIDC / JWT / cookies |
-| Routing | Single-view met panels | React Router (URL-based) |
-| Template | `project-templates/Tauri+React/` | Geen template (volg deze gids) |
+| Navigatie | Single-view met panels | React Router (URL-based), view switchen via ribbon |
+| Template | `project-templates/Tauri+React/` | Kopieer shell-componenten uit template |
+
+**Belangrijk:** Alle OpenAEC apps gebruiken dezelfde app-shell: een top bar, ribbon toolbar, content area, en status bar. Het enige verschil is dat desktop apps een custom TitleBar met window controls hebben, en web apps een AppBar met brand + user menu. De rest van de UI (ribbon, backstage, statusbar) is **identiek**.
 
 **Lees altijd eerst:**
 - `brandbook/DESIGN-SYSTEM.md` — design tokens (kleuren, typografie, spacing, componenten)
 - `brandbook/LAYOUTS.md` — layout specs
-
-**Extra voor desktop:**
-- `project-templates/Tauri+React/COMPONENT-MANIFEST.md`
-- `project-templates/Tauri+React/INTEGRATION.md`
+- `project-templates/Tauri+React/COMPONENT-MANIFEST.md` — alle shell-componenten
+- `project-templates/Tauri+React/INTEGRATION.md` — integratiegids
 
 ---
 
@@ -199,107 +200,120 @@ Voeg app-specifieke kleuren toe (chart kleuren, domein-badges, etc.):
 
 ---
 
-## Fase 3 — App shell bouwen
+## Fase 3 — App shell bouwen (BEIDE PLATFORMS)
 
-### DESKTOP: TitleBar + Ribbon + StatusBar
+Alle OpenAEC apps hebben dezelfde shell-structuur. Kopieer de volgende bestanden uit `project-templates/Tauri+React/`:
 
-Kopieer de volgende bestanden uit `project-templates/Tauri+React/`:
+### 3.1 Verplichte shell-componenten
 
 | Component | Bestanden | Afmeting | Doel |
 |-----------|----------|----------|------|
-| TitleBar | `TitleBar.tsx` + `.css` | 32px hoog | Window chrome, quick-access (Save/Undo/Redo) |
-| Ribbon | `ribbon/Ribbon.tsx` + `.css` + `RibbonTab/Button/Group/ButtonStack.tsx` | 122px (28px tabs + 94px content) | Tab-gebaseerde toolbar |
-| StatusBar | `StatusBar.tsx` + `.css` | 22px hoog | Informatieve footer |
-| Backstage | `backstage/Backstage.tsx` + `.css` | Overlay (z:1000) | File menu |
-| Modal | `Modal.tsx` + `.css` | Overlay (z:10000) | Dialogen |
-| SettingsDialog | `settings/SettingsDialog.tsx` + `.css` | Modal | Thema/taal |
+| **Ribbon** | `ribbon/Ribbon.tsx` + `.css` + `RibbonTab.tsx` + `RibbonButton.tsx` + `RibbonGroup.tsx` + `RibbonButtonStack.tsx` | 122px (28px tabs + 94px content) | Tab-gebaseerde toolbar |
+| **Backstage** | `backstage/Backstage.tsx` + `.css` | Overlay (z:1000) | File menu |
+| **StatusBar** | `StatusBar.tsx` + `.css` | 22px hoog | Informatieve footer |
+| **Modal** | `Modal.tsx` + `.css` | Overlay (z:10000) | Dialogen |
+| **SettingsDialog** | `settings/SettingsDialog.tsx` + `.css` | Modal | Thema/taal |
 
-**Layout structuur (flex h-screen flex-col):**
+### 3.2 Platform-specifieke top bar
+
+| Platform | Component | Hoogte | Inhoud |
+|----------|----------|--------|--------|
+| **Desktop** | `TitleBar.tsx` + `.css` | 32px | Window controls (min/max/close), quick-access (Save/Undo/Redo), app-naam |
+| **Web** | `AppBar.tsx` + `.css` | 40px | Brand wordmark, user menu (login/logout/avatar) |
+
+**AppBar specificatie (web):**
 ```
-AppShell
-├── TitleBar          (32px, flex-shrink: 0)
-├── Ribbon            (122px, flex-shrink: 0)
-├── MainContent       (flex-1, overflow-hidden)
-│   ├── Sidebar       (optioneel, toggleable)
-│   └── Editor Panel  (flex-1)
-└── StatusBar         (22px, flex-shrink: 0)
-```
+APPBAR:
+  background: var(--theme-bg-lighter) (#44444C)
+  height: 40px
+  border-bottom: 1px solid var(--theme-border)
+  flex-shrink: 0
+  padding: 0 12px
+  display: flex, align-items: center, justify-content: space-between
 
-**Ribbon detail:**
-- Tab layer (28px): File tab (amber bg), Home/Insert/View tabs, animated border indicator
-- Content layer (94px): RibbonGroups met RibbonButtons, slide-animatie bij tab switch
-- File tab opent Backstage overlay
+LEFT SIDE:
+  App icon (20×20px)
+  Brand: Space Grotesk 700, 0.875rem
+    "Open" → #FAFAF9 (white)
+    "AEC"  → #D97706 (amber)
+  App subtitle: scaffold-gray, Inter 400, 0.75rem
 
-**RibbonButton sizes:**
-- Large (default): 44×66px, icon boven label, verticaal
-- Medium: 70×33px, icon naast label, horizontaal
-- Small: 70×22px, compact horizontaal
-
-### WEB: Navbar + Page layout
-
-Web apps gebruiken een lichter shell-patroon:
-
-**Layout structuur:**
-```
-App
-├── Navbar            (56px, vast bovenaan)
-│   ├── Brand         ("Open" wit + "AEC" amber)
-│   ├── Navigation    (links naar pagina's)
-│   └── User menu     (login/logout)
-└── <Routes>
-    └── Page content  (max-width: 1280px, centered)
-```
-
-**Navbar specificatie:**
-```
-NAVBAR:
-  background: #36363E (deep-forge)
-  border-top: 3px amber gradient (linear-gradient 90deg, #D97706 → #F59E0B → #EA580C)
-  height: 56px (h-14)
-  padding: 0 16px
-
-BRAND:
-  font: Space Grotesk 700, 1.125rem
-  "Open" → #FAFAF9 (white)
-  "AEC"  → #D97706 (amber)
-  Subtitel → scaffold-gray, Inter 400, 0.875rem
-
-NAV LINKS:
-  font: Inter 500, 0.875rem
-  idle: scaffold-gray (#A1A1AA)
-  hover: white, bg white/10
-  active: bg amber, text white
-  border-radius: 4px
-  padding: 6px 12px
-
-LOGIN BUTTON:
-  bg: amber, text: white, font-weight: 600
-  hover: signal-orange
-  border-radius: 8px
-  padding: 6px 12px
-
-USER MENU:
-  Naam: scaffold-gray, 0.875rem
+RIGHT SIDE:
+  User avatar (24×24px circle, amber bg, deep-forge text, first letter)
+  Username: scaffold-gray, 0.75rem
+  Login button (als niet ingelogd): amber bg, 0.75rem, 600 weight
   Logout icon: scaffold-gray, hover white
 ```
 
-**Page tabs (binnen een pagina, bijv. project detail):**
-```
-TAB BAR:
-  border-bottom: 1px solid #E7E5E4
+### 3.3 Layout structuur
 
-TAB BUTTON:
-  font: Inter 600, 0.875rem
-  idle: text-muted, border-bottom transparent
-  active: text amber, border-bottom 2px amber
-  hover: text darker, border-bottom border-color
-  padding: 10px 16px
+```
+AppShell (flex h-screen flex-col, data-theme={theme})
+├── TitleBar (desktop) of AppBar (web)   — flex-shrink: 0
+├── Ribbon                                — flex-shrink: 0
+│   ├── Tab layer (28px)                  — File tab (amber), Home, [domein tabs]
+│   └── Content layer (94px)              — RibbonGroups met RibbonButtons
+├── MainContent                           — flex-1, overflow-hidden
+│   ├── Sidebar (optioneel, toggleable)   — flex-shrink: 0
+│   └── Content Panel (flex-1)            — domein-specifieke inhoud
+└── StatusBar (22px)                      — flex-shrink: 0
 ```
 
-**Responsive:**
-- Mobile: hamburger menu, nav items in dropdown
-- Tablet+: inline nav links
-- Max content width: 1280px (max-w-7xl), centered met auto margins
+**Web-specifiek:** De content panel gebruikt React Router voor verschillende views. De ribbon tabs bepalen welke tools beschikbaar zijn, de URL bepaalt welke content zichtbaar is. Voorbeeld BCF platform:
+```
+Ribbon tabs: File | Home | View
+URL routes:  / (project lijst), /projects/:id (detail), /projects/:id/topics/:id (issue)
+```
+
+### 3.4 Ribbon detail
+
+**Tab layer (28px):**
+- File tab: **altijd eerste**, amber achtergrond (`#D97706`), opent Backstage
+- Overige tabs: idle = scaffold-gray, active = theme-bg met amber border
+- Geanimeerde border-indicator die schuift tussen tabs (300ms cubic-bezier)
+- Tabs + content animeren met slide left/right bij wisselen
+
+**Content layer (94px):**
+- RibbonGroups: verticale kolommen met label onderaan
+- RibbonButtons in drie formaten:
+  - **Large** (default): 44×66px, icon (28×28) boven label (10px, max 2 regels)
+  - **Medium**: 70×33px, icon (20×20) naast label, horizontaal
+  - **Small**: 70×22px, icon (16×16) naast label, compact
+- Group separator: 1px border-right
+- Group label: 9px, uppercase, letter-spacing 0.3px, scaffold-gray
+
+**Backstage overlay:**
+- Positie: `fixed`, top = hoogte van top bar, left/right/bottom = 0
+- Sidebar: 260px breed, theme-bg-lighter
+- Menu items: 10px 20px padding, 3px left-border (amber wanneer actief)
+- Content area: flex-1, 40px padding
+- Verplichte items: New, Open, Save, Save As, Preferences, About, Exit/Sluiten
+- Escape sluit backstage
+
+### 3.5 StatusBar
+
+```
+STATUSBAR:
+  height: 22px
+  background: var(--theme-status-bg)
+  border-top: 1px solid var(--theme-status-border)
+  font-size: 12px
+  display: flex, justify-content: space-between
+  padding: 0 12px
+
+LEFT: status items (bijv. "3 issues", "Project: naam")
+RIGHT: connection indicator (groen/amber/rood dot, 8px), versienummer
+
+SEPARATOR: 1px breed, 14px hoog, theme-status-separator
+```
+
+### 3.6 Responsive (web)
+
+- **≥1024px:** Volledige ribbon met alle knoppen
+- **768–1023px:** Ribbon met kleinere knoppen (medium/small formaat)
+- **<768px:** Ribbon collapst naar een compacte toolbar met hamburger menu voor volledige ribbon
+- StatusBar altijd zichtbaar
+- Content area scrollt, shell is vast
 
 ---
 
@@ -483,15 +497,22 @@ Escape  → Sluit dialoog/backstage
 
 #### 5.4 Routing
 
+Web apps gebruiken React Router, maar de shell (AppBar + Ribbon + StatusBar) blijft altijd zichtbaar. De `<Outlet>` zit in het content panel:
+
 ```tsx
-<Routes>
-  <Route element={<Layout />}>           {/* Navbar + Outlet */}
-    <Route path="/" element={<Home />} />
-    <Route path="/items/:id" element={<Detail />} />
-    <Route path="/settings" element={<Settings />} />
-  </Route>
-</Routes>
+<BrowserRouter>
+  <AuthProvider>
+    <AppShell>                              {/* AppBar + Ribbon + StatusBar */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/items/:id" element={<Detail />} />
+      </Routes>
+    </AppShell>
+  </AuthProvider>
+</BrowserRouter>
 ```
+
+De ribbon tabs kunnen contextafhankelijk zijn — bijv. andere knoppen op de project-lijst dan op een issue-detail pagina. Gebruik `useLocation()` om de actieve context te bepalen.
 
 #### 5.5 Auth context
 
@@ -502,6 +523,7 @@ Escape  → Sluit dialoog/backstage
 - Stuur mee als Authorization: Bearer header
 - /auth/login redirect → OIDC provider
 - /auth/me → haal user info op
+- Login/logout beschikbaar via AppBar user menu
 ```
 
 #### 5.6 API client
@@ -637,16 +659,18 @@ React Context of Zustand store
 
 ### Web-specifiek
 
-- [ ] Navbar: deep-forge (#36363E) achtergrond
-- [ ] Brand: "Open" wit + "AEC" amber in navbar
-- [ ] Nav links: scaffold-gray idle, amber active
-- [ ] Login knop: amber primary button
-- [ ] Responsive: hamburger menu op mobile
-- [ ] Page tabs: amber bottom-border active state
+- [ ] AppBar: deep-forge achtergrond, brand wordmark, user menu
+- [ ] Brand: "Open" wit + "AEC" amber in AppBar
+- [ ] Ribbon: File tab (amber), Home tab, domein-tabs
+- [ ] Ribbon knoppen: werkend OF disabled met tooltip
+- [ ] Backstage: opent via File tab, verplichte items aanwezig
+- [ ] StatusBar: relevante info (item count, connectie-status)
+- [ ] Login/logout via AppBar user menu
+- [ ] Ribbon tabs context-aware (andere knoppen per pagina)
 - [ ] Routes werken (back/forward navigatie)
 - [ ] Auth flow: login redirect, token opslag, logout
 - [ ] API calls sturen auth header mee
-- [ ] Empty states met icon + tekst
+- [ ] Responsive: ribbon collapst op kleine schermen
 
 ### Code (BEIDE)
 
@@ -669,7 +693,8 @@ React Context of Zustand store
 | Thema switcht niet | Desktop: check `data-theme` attribuut. Web: check `@theme` blok |
 | Knop doet niets | Verwijder of `disabled` met tooltip "Binnenkort beschikbaar" |
 | Mix van NL/EN in UI | Alles via i18n, geen hardcoded strings |
-| Web app mist gradient strip | Voeg `linear-gradient(90deg, #D97706, #F59E0B, #EA580C)` border-top toe aan navbar |
+| Web app gebruikt navbar i.p.v. ribbon | ALLE apps krijgen ribbon — kopieer shell-componenten uit template |
+| Web app mist gradient strip | Gradient strip zit in de ribbon tab-layer bottom-border |
 | Cards hebben geen border | Altijd `1px solid #E7E5E4`, niet alleen shadow |
 | Input focus is blauw (browser default) | Override met amber: `border-color: #D97706; box-shadow: 0 0 0 3px rgba(217,119,6,0.15)` |
 | Badge is vierkant | Gebruik `border-radius: 9999px` voor pill-vorm |
