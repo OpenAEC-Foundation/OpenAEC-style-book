@@ -150,7 +150,29 @@ Based on 4px (0.25rem) increments:
 --radius-full:  9999px — Badges, pills, tags
 ```
 
-### 2.5 Shadows
+### 2.5 Dashboard / Dense UI Tokens
+
+For dense, application dashboards with dark sidebars, panels, and terminal-style output areas.
+Derived from core brand tokens — no new colors introduced.
+
+| Token | Value | Derived from | Usage |
+|-------|-------|-------------|-------|
+| `--dashboard-bg` | `#2A2A32` | `--night-build` | Primary background |
+| `--dashboard-surface` | `#36363E` | `--deep-forge` | Cards, panels |
+| `--dashboard-surface-hover` | `#3E3E48` | deep-forge + 8% | Hover states |
+| `--dashboard-sidebar` | `#222228` | night-build − 8% | Sidebar, left nav |
+| `--dashboard-border` | `#4A4A54` | deep-forge + border | Dividers, outlines |
+| `--dashboard-border-light` | `#404048` | subtle dividers | Section separators |
+| `--dashboard-text` | `#FAFAF9` | `--blueprint-white` | Primary text |
+| `--dashboard-text-muted` | `#A1A1AA` | `--scaffold-gray` | Secondary text, labels |
+| `--dashboard-text-dim` | `#666670` | scaffold-gray 60% | Timestamps, metadata |
+| `--dashboard-accent` | `#D97706` | `--amber` | Active states, selection |
+| `--dashboard-accent-bg` | `#2E2418` | amber 10% on dark | Accent backgrounds |
+| `--dashboard-accent-hover` | `#EA580C` | `--signal-orange` | Hover on accent |
+| `--dashboard-terminal` | `#F59E0B` | `--warm-gold` | Terminal/live output context |
+| `--dashboard-terminal-dim` | `#D97706` | `--amber` | Dimmed terminal text |
+
+### 2.6 Shadows
 
 ```
 --shadow-sm:  0 1px 2px rgba(0,0,0,0.05)
@@ -158,7 +180,7 @@ Based on 4px (0.25rem) increments:
 --shadow-lg:  0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)
 ```
 
-### 2.6 Borders
+### 2.7 Borders
 
 ```
 Default border:     1px solid #E7E5E4
