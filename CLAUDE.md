@@ -41,6 +41,14 @@ De volledige visuele identiteit van OpenAEC Foundation beheren en beschikbaar st
 
 ---
 
+## Agent Broker
+- **project_id:** `style-book`
+- **display_name:** `OpenAEC Stijlbook`
+- **capabilities:** `["branding", "design-system", "assets"]`
+- **subscriptions:** `["shared/*"]`
+
+---
+
 ## Notities
 
 - **Schrijfwijze:** Altijd "OpenAEC" als één woord (hoofdletter O, AEC in caps). Nooit "Open AEC" of "OPENAEC"
