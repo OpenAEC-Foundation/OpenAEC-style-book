@@ -1,4 +1,4 @@
-/* Backstage Overlay */
+/* Backstage Overlay — transparent click-catcher behind the menu */
 .backstage-overlay {
   position: fixed;
   top: 32px; /* titlebar height */
@@ -8,17 +8,20 @@
   z-index: 1000;
   display: flex;
   flex-direction: row;
-  background: var(--theme-bg);
+  background: transparent;
+  pointer-events: auto;
 }
 
-/* Sidebar */
+/* Sidebar — anchored at the left, drops a panel-shadow */
 .backstage-sidebar {
   width: 260px;
   background: var(--theme-bg-lighter);
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--theme-border);
+  box-shadow: var(--theme-panel-shadow);
   flex-shrink: 0;
+  height: 100%;
 }
 
 /* Back button */
@@ -120,13 +123,25 @@
   margin: 4px 16px;
 }
 
-/* Content area */
+/* Content area — only shown when a panel is active. Width is constrained,
+   not full-screen, and the rest of the underlying app stays visible. */
 .backstage-content {
-  flex: 1;
+  width: 580px;
+  max-width: calc(100vw - 260px - 40px);
   background: var(--theme-bg);
-  padding: 40px;
+  border-right: 1px solid var(--theme-border);
+  box-shadow: var(--theme-panel-shadow);
+  padding: 32px 40px;
   overflow-y: auto;
   color: var(--theme-text);
+  height: 100%;
+}
+
+/* The click-catcher fills the remaining space and closes the menu on click. */
+.backstage-dismiss-area {
+  flex: 1;
+  background: transparent;
+  cursor: default;
 }
 
 /* About Panel */
@@ -223,6 +238,14 @@
   color: var(--theme-text);
   margin: 0;
   line-height: 1.5;
+}
+
+.bs-about-company-meta {
+  font-size: 10px;
+  color: var(--theme-text-secondary);
+  margin: 8px 0 0;
+  font-style: italic;
+  letter-spacing: 0.3px;
 }
 
 .bs-about-links {

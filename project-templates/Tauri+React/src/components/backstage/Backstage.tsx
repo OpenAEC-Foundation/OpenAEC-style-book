@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { useRecentFiles, type RecentFile } from "../../hooks/useRecentFiles";
 import ExtensionManagerPanel from "./ExtensionManagerPanel";
 import "./Backstage.css";
 
@@ -55,11 +56,13 @@ interface BackstageProps {
   open: boolean;
   onClose: () => void;
   onOpenSettings: () => void;
+  onOpenFile?: (path: string) => void;
 }
 
-export default function Backstage({ open, onClose, onOpenSettings }: BackstageProps) {
+export default function Backstage({ open, onClose, onOpenSettings, onOpenFile }: BackstageProps) {
   const { t } = useTranslation("backstage");
   const [activePanel, setActivePanel] = useState<string>("none");
+  const { recentFiles, removeRecentFile, clearRecentFiles } = useRecentFiles();
 
   const actionAndClose = useCallback(
     (fn?: () => void) => {
@@ -83,9 +86,12 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
 
   if (!open) return null;
 
-  const handleContentClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) onClose();
-  };
+  const hasActivePanel =
+    activePanel === "open" ||
+    activePanel === "about" ||
+    activePanel === "import" ||
+    activePanel === "export" ||
+    activePanel === "extensions";
 
   return (
     <div className="backstage-overlay">
@@ -116,7 +122,8 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
             icon={ICONS.open}
             label={t("open")}
             shortcut="Ctrl+O"
-            onClick={() => actionAndClose()}
+            active={activePanel === "open"}
+            onClick={() => setActivePanel("open")}
           />
           <MenuItem
             icon={ICONS.save}
@@ -183,18 +190,41 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
           />
         </div>
       </div>
-      <div className="backstage-content" onClick={handleContentClick}>
-        {activePanel === "about" && <AboutPanel />}
-        {activePanel === "import" && <ImportPanel />}
-        {activePanel === "export" && <ExportPanel />}
-        {activePanel === "extensions" && <ExtensionManagerPanel />}
-      </div>
+      {hasActivePanel && (
+        <div className="backstage-content">
+          {activePanel === "open" && (
+            <OpenPanel
+              recentFiles={recentFiles}
+              onOpenFile={(path) => { onClose(); onOpenFile?.(path); }}
+              onRemoveFile={removeRecentFile}
+              onClearAll={clearRecentFiles}
+            />
+          )}
+          {activePanel === "about" && <AboutPanel />}
+          {activePanel === "import" && <ImportPanel />}
+          {activePanel === "export" && <ExportPanel />}
+          {activePanel === "extensions" && <ExtensionManagerPanel />}
+        </div>
+      )}
+      {/* Click anywhere outside the menu/panel to close */}
+      <div className="backstage-dismiss-area" onClick={onClose} />
     </div>
   );
 }
 
 function AboutPanel() {
   const { t } = useTranslation("backstage");
+
+  const openExternal = (url: string) => async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      const { openUrl } = await import("@tauri-apps/plugin-opener");
+      await openUrl(url);
+    } catch {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+  };
+
   return (
     <div className="bs-about-panel">
       <h2 className="bs-about-title">{t("aboutPanel.title")}</h2>
@@ -208,15 +238,15 @@ function AboutPanel() {
             <rect x="40" y="40" width="944" height="944" rx="180" fill="var(--theme-accent)" />
             <text
               x="512"
-              y="580"
+              y="600"
               textAnchor="middle"
               dominantBaseline="middle"
               fill="var(--theme-accent-text)"
-              fontSize="340"
-              fontFamily="Arial, sans-serif"
-              fontWeight="400"
+              fontSize="320"
+              fontFamily="'Space Grotesk', 'Inter', Arial, sans-serif"
+              fontWeight="700"
             >
-              tmp
+              OA
             </text>
           </svg>
         </div>
@@ -230,16 +260,27 @@ function AboutPanel() {
       <div className="bs-about-company">
         <h3 className="bs-about-company-name">{t("aboutPanel.companyName")}</h3>
         <p className="bs-about-company-desc">{t("aboutPanel.companyDescription")}</p>
+        <p className="bs-about-company-meta">
+          {t("aboutPanel.stichting")}
+        </p>
       </div>
       <div className="bs-about-links">
-        <a href="#" className="bs-about-link" onClick={(e) => e.preventDefault()}>
+        <a
+          href="https://www.open-aec.com/"
+          className="bs-about-link"
+          onClick={openExternal("https://www.open-aec.com/")}
+        >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10" />
             <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z" />
           </svg>
           {t("aboutPanel.website")}
         </a>
-        <a href="#" className="bs-about-link" onClick={(e) => e.preventDefault()}>
+        <a
+          href="https://github.com/OpenAEC-Foundation"
+          className="bs-about-link"
+          onClick={openExternal("https://github.com/OpenAEC-Foundation")}
+        >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" />
           </svg>
@@ -288,6 +329,126 @@ function ImportPanel() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function OpenPanel({
+  recentFiles,
+  onOpenFile,
+  onRemoveFile,
+  onClearAll,
+}: {
+  recentFiles: RecentFile[];
+  onOpenFile: (path: string) => void;
+  onRemoveFile: (path: string) => void;
+  onClearAll: () => void;
+}) {
+  const { t } = useTranslation("backstage");
+
+  const typeIcon = (type: RecentFile["type"]) => {
+    switch (type) {
+      case "ifc":
+        return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>';
+      case "report":
+        return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>';
+      case "project":
+        return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>';
+      default:
+        return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M13 2v7h7"/></svg>';
+    }
+  };
+
+  const formatDate = (ts: number) => {
+    const d = new Date(ts);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return t("openPanel.justNow", "Just now");
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return `${diffHr}h ago`;
+    const diffDay = Math.floor(diffHr / 24);
+    if (diffDay < 7) return `${diffDay}d ago`;
+    return d.toLocaleDateString();
+  };
+
+  return (
+    <div className="bs-export-panel">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <h2 className="bs-export-title" style={{ margin: 0 }}>{t("openPanel.title", "Recent Files")}</h2>
+        {recentFiles.length > 0 && (
+          <button
+            onClick={onClearAll}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--theme-text-muted, #888)",
+              cursor: "pointer",
+              fontSize: "0.8rem",
+              textDecoration: "underline",
+            }}
+          >
+            {t("openPanel.clearAll", "Clear all")}
+          </button>
+        )}
+      </div>
+      {recentFiles.length === 0 ? (
+        <p style={{ color: "var(--theme-text-muted, #888)", fontStyle: "italic" }}>
+          {t("openPanel.noRecent", "No recent files")}
+        </p>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {recentFiles.map((file) => (
+            <div
+              key={file.path}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "8px 12px",
+                borderRadius: 6,
+                cursor: "pointer",
+                transition: "background 0.15s",
+              }}
+              className="bs-recent-item"
+              onClick={() => onOpenFile(file.path)}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "var(--theme-hover, rgba(0,0,0,0.05))")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            >
+              <span dangerouslySetInnerHTML={{ __html: typeIcon(file.type) }} style={{ opacity: 0.6, flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 500, fontSize: "0.9rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {file.name}
+                </div>
+                <div style={{ fontSize: "0.75rem", color: "var(--theme-text-muted, #888)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {file.path}
+                </div>
+              </div>
+              <span style={{ fontSize: "0.75rem", color: "var(--theme-text-muted, #888)", flexShrink: 0 }}>
+                {formatDate(file.timestamp)}
+              </span>
+              <button
+                onClick={(e) => { e.stopPropagation(); onRemoveFile(file.path); }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: 4,
+                  opacity: 0.4,
+                  color: "currentColor",
+                  flexShrink: 0,
+                }}
+                title={t("openPanel.remove", "Remove")}
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <path d="M3 3l6 6M9 3l-6 6" />
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

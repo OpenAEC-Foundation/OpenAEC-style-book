@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <title>OpenAEC Foundation — LinkedIn Profile Picture</title>
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2A2A32"/>
+      <stop offset="100%" stop-color="#36363E"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="accentStrip" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D97706"/>
+      <stop offset="40%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#EA580C"/>
+    </linearGradient>
+    <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
+      <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#FAFAF9" stroke-width="0.3"/>
+    </pattern>
+    <clipPath id="circleClip">
+      <circle cx="150" cy="150" r="150"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#circleClip)">
+    <!-- Background -->
+    <rect width="300" height="300" fill="url(#bgGrad)"/>
+
+    <!-- Blueprint grid -->
+    <rect width="300" height="300" fill="url(#grid)" opacity="0.12"/>
+
+    <!-- Accent strip at bottom -->
+    <rect x="0" y="294" width="300" height="6" fill="url(#accentStrip)"/>
+
+    <!-- Symbol centered and large -->
+    <g transform="translate(150,128) scale(0.95)">
+      <!-- Left face -->
+      <polygon points="-60,-20 0,15 0,80 -60,45"
+        fill="#D97706" fill-opacity="0.25"
+        stroke="#D97706" stroke-width="2.8" stroke-linejoin="round"/>
+
+      <!-- Top face -->
+      <polygon points="0,-55 60,-20 0,15 -60,-20"
+        fill="#D97706" fill-opacity="0.14"
+        stroke="#D97706" stroke-width="2.8" stroke-linejoin="round"/>
+
+      <!-- Right face: open -->
+      <line x1="60" y1="-20" x2="60" y2="45" stroke="#D97706" stroke-width="2.8" stroke-linecap="round"/>
+      <line x1="0" y1="80" x2="60" y2="45" stroke="#D97706" stroke-width="2.8" stroke-linecap="round"/>
+
+      <!-- Inner shelf -->
+      <polygon points="60,-20 0,15 0,32 60,0"
+        fill="url(#amberGrad)" fill-opacity="0.20"/>
+      <line x1="0" y1="15" x2="0" y2="32" stroke="#D97706" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="0" y1="32" x2="60" y2="0" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round"/>
+
+      <!-- Accent lines -->
+      <line x1="0" y1="32" x2="-28" y2="48" stroke="#F59E0B" stroke-width="1.2" opacity="0.3"/>
+      <line x1="60" y1="0" x2="32" y2="16" stroke="#F59E0B" stroke-width="1.2" opacity="0.3"/>
+
+      <!-- Window grid -->
+      <g stroke="#D97706" stroke-width="1.2" fill="none" opacity="0.5">
+        <rect x="-44" y="-6" width="10" height="7" rx="1" transform="skewY(-30)"/>
+        <rect x="-30" y="-6" width="10" height="7" rx="1" transform="skewY(-30)"/>
+        <rect x="-44" y="6" width="10" height="7" rx="1" transform="skewY(-30)"/>
+        <rect x="-30" y="6" width="10" height="7" rx="1" transform="skewY(-30)"/>
+        <rect x="-44" y="18" width="10" height="7" rx="1" transform="skewY(-30)"/>
+        <rect x="-30" y="18" width="10" height="7" rx="1" transform="skewY(-30)"/>
+      </g>
+    </g>
+
+    <!-- Foundation text below symbol -->
+    <text x="150" y="245" font-family="'Space Grotesk', system-ui, sans-serif" font-weight="700" font-size="22" text-anchor="middle" letter-spacing="-0.02em">
+      <tspan fill="#FAFAF9">Open</tspan><tspan fill="#D97706">AEC</tspan>
+    </text>
+
+    <!-- Subtle decorative dots -->
+    <circle cx="50" cy="50" r="2" fill="#D97706" opacity="0.25"/>
+    <circle cx="250" cy="60" r="1.5" fill="#F59E0B" opacity="0.2"/>
+    <circle cx="40" cy="240" r="1.5" fill="#F59E0B" opacity="0.15"/>
+    <circle cx="260" cy="250" r="2" fill="#D97706" opacity="0.2"/>
+  </g>
+</svg>

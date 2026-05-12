@@ -1,27 +1,18 @@
-import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { getSetting, setSetting } from "../../store";
+import { setSetting } from "../../store";
+import { useRecentFiles } from "../../hooks/useRecentFiles";
 import "./WelcomeScreen.css";
 
 interface WelcomeScreenProps {
   onClose: () => void;
   onNewProject: () => void;
   onOpenProject: () => void;
+  onOpenFile?: (path: string) => void;
 }
 
-interface RecentProject {
-  name: string;
-  path: string;
-  date: string;
-}
-
-export default function WelcomeScreen({ onClose, onNewProject, onOpenProject }: WelcomeScreenProps) {
+export default function WelcomeScreen({ onClose, onNewProject, onOpenProject, onOpenFile }: WelcomeScreenProps) {
   const { t } = useTranslation("common");
-  const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
-
-  useEffect(() => {
-    getSetting<RecentProject[]>("recentProjects", []).then(setRecentProjects);
-  }, []);
+  const { recentFiles } = useRecentFiles();
 
   const handleNewProject = () => {
     onNewProject();
@@ -84,21 +75,23 @@ export default function WelcomeScreen({ onClose, onNewProject, onOpenProject }: 
 
           <div className="welcome-recent">
             <h2>{t("welcome.recent")}</h2>
-            {recentProjects.length === 0 ? (
+            {recentFiles.length === 0 ? (
               <p className="welcome-empty">{t("welcome.noRecent")}</p>
             ) : (
               <div className="welcome-recent-list">
-                {recentProjects.map((p, i) => (
-                  <button key={i} className="welcome-recent-item" onClick={handleSkip}>
+                {recentFiles.map((f, i) => (
+                  <button key={i} className="welcome-recent-item" onClick={() => { onOpenFile?.(f.path); onClose(); }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
                       <path d="M14 2v6h6" />
                     </svg>
                     <div className="welcome-recent-info">
-                      <span className="welcome-recent-name">{p.name}</span>
-                      <span className="welcome-recent-path">{p.path}</span>
+                      <span className="welcome-recent-name">{f.name}</span>
+                      <span className="welcome-recent-path">{f.path}</span>
                     </div>
-                    <span className="welcome-recent-date">{p.date}</span>
+                    <span className="welcome-recent-date">
+                      {new Date(f.timestamp).toLocaleDateString()}
+                    </span>
                   </button>
                 ))}
               </div>

@@ -8,8 +8,11 @@ import "../ThemedSelect.css";
 import "./SettingsDialog.css";
 
 const THEME_OPTIONS = [
-  { value: "light", labelKey: "appearance.light", swatches: ["#36363E", "#D97706", "#FAFAF9", "#EA580C"] },
-  { value: "openaec", labelKey: "appearance.dark", swatches: ["#27272A", "#D97706", "#FAFAF9", "#EA580C"] },
+  { value: "light",     labelKey: "appearance.light",     swatches: ["#FAFAF9", "#FFFFFF", "#D97706", "#36363E"] },
+  { value: "forge",     labelKey: "appearance.forge",     swatches: ["#36363E", "#44444C", "#D97706", "#FAFAF9"] },
+  { value: "openaec",   labelKey: "appearance.dark",      swatches: ["#27272A", "#1C1917", "#D97706", "#FAFAF9"] },
+  { value: "blueprint", labelKey: "appearance.blueprint", swatches: ["#0F1B2D", "#1A2C45", "#60A5FA", "#E0E7FF"] },
+  { value: "contrast",  labelKey: "appearance.contrast",  swatches: ["#000000", "#0A0A0A", "#FFD700", "#FFFFFF"] },
 ];
 
 /* ─── Tab configuratie ──────────────────────────────────────
@@ -63,10 +66,25 @@ export default function SettingsDialog({
     }
   }, [open, theme]);
 
-  // Cancel — discard all draft changes, restore originals
+  // Live theme preview — apply immediately when the user picks one in the dropdown.
+  // Saved only on Save; reverted on Cancel.
+  const handleThemePreview = (value: string) => {
+    setDraftTheme(value);
+    applyTheme(value);
+  };
+
+  // Live language preview — switch i18n immediately on selection.
+  const handleLangPreview = (value: string) => {
+    setDraftLang(value);
+    changeLanguage(value);
+  };
+
+  // Cancel — discard all draft changes, revert live preview
   const handleCancel = () => {
     setDraftTheme(originalTheme.current);
+    applyTheme(originalTheme.current);
     setDraftLang(originalLang.current);
+    changeLanguage(originalLang.current);
     onClose();
   };
 
@@ -89,7 +107,9 @@ export default function SettingsDialog({
 
   const handleConfirmReset = () => {
     setDraftTheme("light");
+    applyTheme("light");
     setDraftLang("auto");
+    changeLanguage("auto");
     setConfirmResetOpen(false);
   };
 
@@ -127,10 +147,10 @@ export default function SettingsDialog({
 
         <div className="settings-content">
           {activeTab === "general" && (
-            <GeneralTabContent lang={draftLang} onLangChange={setDraftLang} />
+            <GeneralTabContent lang={draftLang} onLangChange={handleLangPreview} />
           )}
           {activeTab === "appearance" && (
-            <AppearanceTabContent theme={draftTheme} onThemeSelect={setDraftTheme} />
+            <AppearanceTabContent theme={draftTheme} onThemeSelect={handleThemePreview} />
           )}
           {activeTab === "about" && <AboutTabContent />}
         </div>

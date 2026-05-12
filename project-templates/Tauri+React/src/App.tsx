@@ -8,16 +8,81 @@ import Backstage from "./components/backstage/Backstage";
 import SettingsDialog, { applyTheme } from "./components/settings/SettingsDialog";
 import FeedbackDialog from "./components/feedback/FeedbackDialog";
 import WelcomeScreen from "./components/welcome/WelcomeScreen";
+import { StartSidebar } from "./components/welcome/StartSidebar";
 import ProjectSettingsDialog from "./components/project/ProjectSettingsDialog";
 import IfcViewerPanel from "./components/panels/IfcViewerPanel";
 import ReportPreview from "./components/panels/ReportPreview";
-import { getSetting } from "./store";
+import { getDetachedParams, useWindowManager } from "./hooks/useWindowManager";
+import { getSetting, setSetting } from "./store";
 import "./themes.css";
 import "./App.css";
 
 const ThreeViewer = lazy(() => import("./components/panels/ThreeViewer"));
 
+/**
+ * Detached window — shows only one view, no ribbon/backstage/etc.
+ * Has a "dock back" button to re-attach to the main window.
+ */
+function DetachedApp({ view, title }: { view: string; title: string }) {
+  const [pageSize] = useState<"A4" | "A3">("A4");
+  const [orientation] = useState<"portrait" | "landscape">("portrait");
+  const { requestDockBack } = useWindowManager();
+
+  useEffect(() => {
+    getSetting("theme", "light").then((saved) => applyTheme(saved));
+    import("@tauri-apps/api/window").then(({ getCurrentWindow }) => {
+      getCurrentWindow().show();
+    }).catch(() => {});
+  }, []);
+
+  const handleDockBack = () => {
+    requestDockBack(title, view);
+  };
+
+  const renderView = () => {
+    switch (view) {
+      case "ifc":
+        return <IfcViewerPanel />;
+      case "report":
+        return <ReportPreview pageSize={pageSize} orientation={orientation} />;
+      case "viewer":
+        return (
+          <Suspense fallback={<div className="placeholder"><p>Loading 3D Viewer...</p></div>}>
+            <ThreeViewer />
+          </Suspense>
+        );
+      default:
+        return <div className="placeholder"><p>Detached view</p></div>;
+    }
+  };
+
+  return (
+    <>
+      <TitleBar onSettingsClick={() => {}} onFeedbackClick={() => {}} />
+      {/* Dock-back bar */}
+      <div className="detached-dock-bar">
+        <span className="detached-dock-title">{title}</span>
+        <button className="detached-dock-btn" onClick={handleDockBack} title="Dock back to main window">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+          </svg>
+          <span>Dock back</span>
+        </button>
+      </div>
+      <main className="main-view" style={{ flex: 1 }}>
+        {renderView()}
+      </main>
+      <StatusBar />
+    </>
+  );
+}
+
 function App() {
+  // Check if this is a detached window
+  const detachedParams = getDetachedParams();
+  if (detachedParams.detached && detachedParams.view) {
+    return <DetachedApp view={detachedParams.view} title={detachedParams.title ?? "Untitled"} />;
+  }
   const { t } = useTranslation();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [backstageOpen, setBackstageOpen] = useState(false);
@@ -28,6 +93,20 @@ function App() {
   const [activeView, setActiveView] = useState("default");
   const [pageSize, setPageSize] = useState<"A4" | "A3">("A4");
   const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
+
+  // Start sidebar — shown only on first launch.
+  // Once the user dismisses it, the flag flips and it never auto-opens again.
+  // Default: undefined (loading) → only render once we know the stored value.
+  const [startSidebarVisible, setStartSidebarVisible] = useState<boolean | null>(null);
+  useEffect(() => {
+    getSetting<boolean>("startSidebarDismissed", false).then((dismissed) => {
+      setStartSidebarVisible(!dismissed);
+    });
+  }, []);
+  const dismissStartSidebar = useCallback(() => {
+    setStartSidebarVisible(false);
+    setSetting("startSidebarDismissed", true);
+  }, []);
 
   // Left panel state (Explorer)
   const [leftPanelWidth, setLeftPanelWidth] = useState(240);
@@ -46,7 +125,9 @@ function App() {
       setTheme(saved);
       applyTheme(saved);
     });
-    getSetting("showWelcome", true).then((show) => {
+    // Welcome modal is no longer auto-shown — the persistent StartSidebar
+    // replaces it. Users can still open it via the help menu.
+    getSetting("showWelcome", false).then((show) => {
       if (show) setWelcomeOpen(true);
     });
     import("@tauri-apps/api/window").then(({ getCurrentWindow }) => {
@@ -152,6 +233,25 @@ function App() {
       />
       <DocumentBar />
       <div className="content">
+        {/* Start sidebar — shown only on first launch. Once dismissed, gone for good. */}
+        {startSidebarVisible && (
+          <StartSidebar
+            onNewFile={() => {
+              setProjectSettingsOpen(true);
+              dismissStartSidebar();
+            }}
+            onOpenFile={() => {
+              setBackstageOpen(true);
+              dismissStartSidebar();
+            }}
+            onOpenRecentFile={(path) => {
+              console.log("Open recent:", path);
+              dismissStartSidebar();
+            }}
+            onClose={dismissStartSidebar}
+          />
+        )}
+
         {/* Left panel — Explorer (hidden in full-width views) */}
         {!isFullWidthView && (
           <aside className={`left-panel${leftPanelOpen ? "" : " collapsed"}${isResizing ? " no-transition" : ""}`} style={{ width: leftPanelOpen ? leftPanelWidth : 28 }}>
@@ -215,7 +315,7 @@ function App() {
         )}
       </div>
       <StatusBar />
-      <Backstage open={backstageOpen} onClose={() => setBackstageOpen(false)} onOpenSettings={() => setSettingsOpen(true)} />
+      <Backstage open={backstageOpen} onClose={() => setBackstageOpen(false)} onOpenSettings={() => setSettingsOpen(true)} onOpenFile={(path) => console.log("Open file:", path)} />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} theme={theme} onThemeChange={setTheme} />
       <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <ProjectSettingsDialog open={projectSettingsOpen} onClose={() => setProjectSettingsOpen(false)} />
@@ -224,6 +324,7 @@ function App() {
           onClose={() => setWelcomeOpen(false)}
           onNewProject={() => setProjectSettingsOpen(true)}
           onOpenProject={() => setBackstageOpen(true)}
+          onOpenFile={(path) => console.log("Open file:", path)}
         />
       )}
     </>

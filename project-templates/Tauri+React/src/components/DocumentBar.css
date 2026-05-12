@@ -96,3 +96,14 @@
   background: var(--theme-ribbon-btn-hover);
   color: var(--theme-accent);
 }
+
+/* Dock-back flash animation */
+.document-bar.dock-flash {
+  animation: dock-flash 0.6s ease;
+}
+
+@keyframes dock-flash {
+  0%   { background: var(--theme-docbar-bg); }
+  30%  { background: rgba(217, 119, 6, 0.15); }
+  100% { background: var(--theme-docbar-bg); }
+}
