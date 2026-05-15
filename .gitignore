@@ -23,3 +23,19 @@ Thumbs.db
 # Session files
 SESSION_STATUS.md
 PROMPTS.md
+
+# Node
+node_modules/
+package-lock.json.bak
+*.tsbuildinfo
+
+# Rust
+target/
+**/target/
+
+# Local-only artifacts
+temp_ref/
+export-png.html
+preview-social.html
+preview-titleblock.html
+export_social_png.py

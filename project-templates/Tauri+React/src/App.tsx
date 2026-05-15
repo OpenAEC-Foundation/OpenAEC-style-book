@@ -24,8 +24,6 @@ const ThreeViewer = lazy(() => import("./components/panels/ThreeViewer"));
  * Has a "dock back" button to re-attach to the main window.
  */
 function DetachedApp({ view, title }: { view: string; title: string }) {
-  const [pageSize] = useState<"A4" | "A3">("A4");
-  const [orientation] = useState<"portrait" | "landscape">("portrait");
   const { requestDockBack } = useWindowManager();
 
   useEffect(() => {
@@ -44,7 +42,7 @@ function DetachedApp({ view, title }: { view: string; title: string }) {
       case "ifc":
         return <IfcViewerPanel />;
       case "report":
-        return <ReportPreview pageSize={pageSize} orientation={orientation} />;
+        return <ReportPreview />;
       case "viewer":
         return (
           <Suspense fallback={<div className="placeholder"><p>Loading 3D Viewer...</p></div>}>
@@ -91,8 +89,6 @@ function App() {
   const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [theme, setTheme] = useState("light");
   const [activeView, setActiveView] = useState("default");
-  const [pageSize, setPageSize] = useState<"A4" | "A3">("A4");
-  const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
 
   // Start sidebar — shown only on first launch.
   // Once the user dismisses it, the flag flips and it never auto-opens again.
@@ -197,7 +193,7 @@ function App() {
       case "ifc":
         return <IfcViewerPanel />;
       case "report":
-        return <ReportPreview pageSize={pageSize} orientation={orientation} />;
+        return <ReportPreview />;
       case "viewer":
         return (
           <Suspense fallback={<div className="placeholder"><p>Loading 3D Viewer...</p></div>}>
@@ -226,10 +222,6 @@ function App() {
         onProjectSettingsClick={() => setProjectSettingsOpen(true)}
         activeView={activeView}
         onViewChange={setActiveView}
-        pageSize={pageSize}
-        orientation={orientation}
-        onPageSizeChange={setPageSize}
-        onOrientationChange={setOrientation}
       />
       <DocumentBar />
       <div className="content">

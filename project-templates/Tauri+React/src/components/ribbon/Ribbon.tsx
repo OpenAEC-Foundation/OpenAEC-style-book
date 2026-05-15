@@ -12,16 +12,20 @@ interface RibbonProps {
   onProjectSettingsClick?: () => void;
   activeView: string;
   onViewChange: (view: string) => void;
-  pageSize: "A4" | "A3";
-  orientation: "portrait" | "landscape";
-  onPageSizeChange: (size: "A4" | "A3") => void;
-  onOrientationChange: (orientation: "portrait" | "landscape") => void;
+  /** @deprecated — read from useReportStore in the Report tab/preview. Kept for prop-compat. */
+  pageSize?: "A4" | "A3";
+  /** @deprecated */
+  orientation?: "portrait" | "landscape";
+  /** @deprecated */
+  onPageSizeChange?: (size: "A4" | "A3") => void;
+  /** @deprecated */
+  onOrientationChange?: (orientation: "portrait" | "landscape") => void;
 }
 
 const TABS = ["home", "ifc", "viewer", "report"] as const;
 type TabId = (typeof TABS)[number];
 
-export default function Ribbon({ onFileTabClick, onSettingsClick, onProjectSettingsClick, onViewChange, pageSize, orientation, onPageSizeChange, onOrientationChange }: RibbonProps) {
+export default function Ribbon({ onFileTabClick, onSettingsClick, onProjectSettingsClick, onViewChange }: RibbonProps) {
   const { t, i18n } = useTranslation("ribbon");
   const [activeTab, setActiveTab] = useState<TabId>("home");
   const [prevTab, setPrevTab] = useState<TabId | null>(null);
@@ -102,7 +106,7 @@ export default function Ribbon({ onFileTabClick, onSettingsClick, onProjectSetti
       case "home": return <HomeTab onSettingsClick={onSettingsClick} onProjectSettingsClick={onProjectSettingsClick} />;
       case "ifc": return <IfcTab />;
       case "viewer": return null; // 3D Viewer has no ribbon buttons
-      case "report": return <ReportTab pageSize={pageSize} orientation={orientation} onPageSizeChange={onPageSizeChange} onOrientationChange={onOrientationChange} />;
+      case "report": return <ReportTab />;
     }
   };
 
